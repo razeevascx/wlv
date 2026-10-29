@@ -11,9 +11,8 @@ $sql = "INSERT INTO videogames(game_name, game_description, released_date, ratin
 VALUE('{$game_name}', '{$game_description}', '{$game_release_date}',
 '{$game_rating}')";
 // Run SQL statement and report errors
-if(!$mysqli -> query($sql)) {
-echo("<h4>SQL error description: " . $mysqli -> error . "</h4>");
+if (!$mysqli->query($sql)) {
+    echo ("<h4>SQL error description: " . $mysqli->error . "</h4>");
 }
 // Redirect to list
 header("location: list-games.php");
-?>

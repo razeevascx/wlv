@@ -1,0 +1,31 @@
+
+*** These modified files were found in JOE when it aborted on Thu Oct 29 14:11:37 2026
+*** JOE was aborted by UNIX signal 1
+
+*** File '(Unnamed)'
+/home/stud/0/2463090/.gitconfig
+
+*** File '* Startup Log *'
+Processing '/etc/joe/editorrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/editorrc
+
+*** These modified files were found in JOE when it aborted on Thu Oct 29 14:11:38 2026
+*** JOE was aborted by UNIX signal 1
+
+*** File '(Unnamed)'
+/home/stud/0/2463090/.gitconfig
+
+*** File '/home/stud/0/2463090/.gitconfig'
+# This is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+#	name = Rajeev Puri
+#	email = r.puri4@wlv.ac.uk
+
+*** File '* Startup Log *'
+Processing '/etc/joe/editorrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/editorrc
