@@ -1,0 +1,39 @@
+<dialog id="edit-game-dialog{{ dialog_suffix }}" class="action-dialog" aria-labelledby="edit-game-title{{ dialog_suffix }}">
+    <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+        <h2 id="edit-game-title{{ dialog_suffix }}" class="h4 mb-0">Edit game</h2>
+        <form method="dialog"><button class="btn-close" type="submit" aria-label="Close edit game"></button></form>
+    </div>
+    <form action="update-game.php" method="post">
+        {% if my_games %}<input type="hidden" name="return_to" value="my-games">{% endif %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="id" value="{{ game.game_id }}">
+        <label class="form-label" for="edit-GameName{{ dialog_suffix }}">Game name</label>
+        <input autofocus required maxlength="150" class="form-control mb-3" id="edit-GameName{{ dialog_suffix }}" name="GameName" value="{{ game.game_name }}">
+        <label class="form-label" for="edit-GameDescription{{ dialog_suffix }}">Description</label>
+        <textarea required maxlength="5000" class="form-control mb-3" id="edit-GameDescription{{ dialog_suffix }}" name="GameDescription" rows="5">{{ game.game_description }}</textarea>
+        <label class="form-label" for="edit-DateReleased{{ dialog_suffix }}">Date released</label>
+        <input required type="date" class="form-control mb-3" id="edit-DateReleased{{ dialog_suffix }}" name="DateReleased" value="{{ game.released_date }}">
+        <label class="form-label" for="edit-GameRating{{ dialog_suffix }}">Rating (0–10)</label>
+        <input required min="0" max="10" type="number" class="form-control mb-4" id="edit-GameRating{{ dialog_suffix }}" name="GameRating" value="{{ game.rating }}">
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-outline-primary" type="button" command="close" commandfor="edit-game-dialog{{ dialog_suffix }}">Cancel</button>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg" aria-hidden="true"></i> Save changes</button>
+        </div>
+    </form>
+</dialog>
+<dialog id="delete-game-dialog{{ dialog_suffix }}" class="action-dialog action-dialog--compact" aria-labelledby="delete-game-title{{ dialog_suffix }}" aria-describedby="delete-game-description{{ dialog_suffix }}">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+        <h2 id="delete-game-title{{ dialog_suffix }}" class="h4 mb-0">Delete game?</h2>
+        <form method="dialog"><button class="btn-close" type="submit" aria-label="Close delete confirmation"></button></form>
+    </div>
+    <p id="delete-game-description{{ dialog_suffix }}" class="text-body-secondary">This will permanently remove <strong>{{ game.game_name }}</strong> from the catalogue and every collection that contains it.</p>
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-outline-primary" type="button" command="close" commandfor="delete-game-dialog{{ dialog_suffix }}" autofocus>Cancel</button>
+        <form method="post" action="delete-game.php">
+            {% if my_games %}<input type="hidden" name="return_to" value="my-games">{% endif %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="id" value="{{ game.game_id }}">
+            <button class="btn btn-danger" type="submit"><i class="bi bi-trash3" aria-hidden="true"></i> Delete game</button>
+        </form>
+    </div>
+</dialog>

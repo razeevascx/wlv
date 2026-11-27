@@ -1,0 +1,86 @@
+{% extends 'account-layout.html' %}
+{% block title %}{{ selected ? selected.name : 'My collections' }}{% endblock %}
+{% block content %}
+<nav class="collection-breadcrumb" aria-label="Breadcrumb">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a class="breadcrumb-link" href="index.php">Home</a></li>
+        {% if selected %}
+        <li class="breadcrumb-item"><a class="breadcrumb-link" href="collections.php">My collections</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ selected.name }}</li>
+        {% else %}
+        <li class="breadcrumb-item active" aria-current="page">My collections</li>
+        {% endif %}
+    </ol>
+</nav>
+<header class="collection-header">
+    <div>
+        <h1>{{ selected ? selected.name : 'My collections' }}</h1>
+        {% if selected %}<p>{{ games|length }} {{ games|length == 1 ? 'game' : 'games' }}</p>{% endif %}
+    </div>
+    <div class="d-flex gap-2">
+    {% if selected %}
+        <button class="btn btn-outline-secondary" command="show-modal" commandfor="rename-collection">Rename</button>
+        <button class="btn btn-primary" command="show-modal" commandfor="add-collection-game">+ Add game</button>
+    {% else %}
+        <button class="btn btn-primary" command="show-modal" commandfor="create-collection">+ New collection</button>
+    {% endif %}
+    </div>
+</header>
+{% if selected %}
+<div class="collection-grid">
+    {% for game in games %}
+    <div class="saved-game">
+        {% include 'components/game-card.html' %}
+        <form class="saved-game-actions" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="collection_id" value="{{ selected.id }}">
+            <input type="hidden" name="game_id" value="{{ game.game_id }}">
+            <button class="btn btn-sm btn-outline-secondary" name="action" value="remove" aria-label="Remove {{ game.game_name }} from collection">Remove</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="collection-empty"><h2>No games yet</h2><p>Choose Add game to save your first title.</p></div>
+    {% endfor %}
+</div>
+<dialog id="add-collection-game" class="action-dialog action-dialog--compact" aria-labelledby="add-title">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0" id="add-title">Add a game</h2>
+        <form method="dialog"><button class="btn-close" aria-label="Close"></button></form>
+    </div>
+    {% if available %}
+    <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="collection_id" value="{{ selected.id }}">
+        <label class="form-label" for="catalogue-game">Catalogue game</label>
+        <select autofocus required class="form-select mb-3" id="catalogue-game" name="game_id">
+            <option value="">Choose a game</option>
+            {% for game in available %}<option value="{{ game.game_id }}">{{ game.game_name }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-primary" name="action" value="add">Add to collection</button>
+    </form>
+    {% else %}<p>No more catalogue games to add.</p>{% endif %}
+    <button class="btn btn-outline-primary mt-3" type="button" command="show-modal" commandfor="add-game-dialog">Add a new game to the catalogue</button>
+</dialog>
+
+{% include 'components/collection-name-dialog.html' with {action: 'rename', title: 'Rename collection'} %}
+{% else %}
+{% include 'components/collection-name-dialog.html' with {action: 'create', title: 'New collection'} %}
+<div class="collection-grid">
+    {% for collection in collections %}
+    <a class="collection-tile" href="collections.php?id={{ collection.id }}">
+        <div class="collection-art">
+            {% if collection.cover %}<img src="{{ collection.cover }}" alt="" loading="lazy" data-game-artwork>
+            {% else %}<i class="bi bi-collection" aria-hidden="true"></i>{% endif %}
+        </div>
+        <div class="collection-caption">
+            <h2>{{ collection.name }}</h2>
+            <span>{{ collection.game_count }} {{ collection.game_count == 1 ? 'game' : 'games' }}</span>
+        </div>
+    </a>
+    {% else %}
+    <div class="collection-empty"><h2>No collections yet</h2><p>Create a collection to keep your favourite games together.</p></div>
+    {% endfor %}
+</div>
+{% endif %}
+<script nonce="{{ csp_nonce }}" src="public/js/game-artwork.js" defer></script>
+{% endblock %}

@@ -1,0 +1,12 @@
+<a class="game-card-link" href="{{ game.details_url|default('game-details.php?id=' ~ game.game_id) }}" aria-labelledby="{{ card_id_prefix|default('game') }}-title-{{ game.game_id }}">
+<article class="game-card">
+    <img class="game-cover{{ game.external.cover|default(null) ? '' : ' is-placeholder' }}" src="{{ game.external.cover|default('public/images/logo.svg', true) }}" alt="" width="640" height="360" loading="lazy" decoding="async" data-game-artwork>
+    <header class="game-card-heading">
+        <h3 id="{{ card_id_prefix|default('game') }}-title-{{ game.game_id }}" class="h5 mb-0">{{ game.game_name }}</h3>
+            <span class="game-rating">
+                <i class="bi bi-star-fill" aria-hidden="true"></i>
+                {{ game.rating }}/10
+            </span>
+    </header>
+</article>
+</a>

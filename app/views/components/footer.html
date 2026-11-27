@@ -1,0 +1,35 @@
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <img src="public/images/logo.svg" alt="" width="44" height="44">
+                <div>
+                    <p class="footer-title">Videogame Catalogue</p>
+                    <p class="footer-description">Find your next game. Build a collection worth coming back to.</p>
+                </div>
+            </div>
+            <nav aria-label="Explore">
+                <h2 class="footer-heading">Explore</h2>
+                <div class="footer-links">
+                    <a class="footer-link" href="index.php">Browse games</a>
+                    <a class="footer-link" href="filter.php">Find a game</a>
+                </div>
+            </nav>
+            <nav aria-label="Your library">
+                <h2 class="footer-heading">Your library</h2>
+                <div class="footer-links">
+                    {% if user_id %}
+                    <a class="footer-link" href="my-games.php">My games</a>
+                    <a class="footer-link" href="collections.php">My collections</a>
+                    {% else %}
+                    <a class="footer-link" href="index.php?auth=login" data-account-dialog="login-dialog">Get started</a>
+                    {% endif %}
+                </div>
+            </nav>
+        </div>
+        <div class="footer-bottom">
+            <small>© {{ 'now'|date('Y') }} Videogame Catalogue</small>
+            <small>Game data and artwork provided by RAWG.</small>
+        </div>
+    </div>
+</footer>

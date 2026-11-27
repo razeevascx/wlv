@@ -1,0 +1,20 @@
+    {% include 'components/rawg-search.html' with {lookup_id: 'add'} %}
+    <form action="add-game.php" method="post" class="mt-3" data-game-form aria-label="Add game">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        {% if my_games %}<input type="hidden" name="return_to" value="my-games">{% endif %}
+        <input type="hidden" name="rawg_id" value="">
+        <div class="rawg-selected mb-3 p-3 rounded border" data-rawg-selected hidden>
+            <p class="small mb-2" data-rawg-selected-name></p>
+            <button class="btn btn-sm btn-outline-primary" type="button" data-rawg-clear>Clear RAWG selection</button>
+        </div>
+        <div class="mb-3"><label class="form-label" for="GameName">Game name</label>
+            <input autofocus required maxlength="150" class="form-control" id="GameName" name="GameName"></div>
+        <div class="mb-3"><label class="form-label" for="GameDescription">Description</label>
+            <textarea required maxlength="5000" class="form-control" id="GameDescription" name="GameDescription" rows="5"></textarea></div>
+        <div class="mb-3"><label class="form-label" for="DateReleased">Date released</label>
+            <input required type="date" class="form-control" id="DateReleased" name="DateReleased"></div>
+        <div class="mb-3"><label class="form-label" for="GameRating">Rating (0-10)</label>
+            <input required min="0" max="10" type="number" class="form-control" id="GameRating" name="GameRating"></div>
+        <button class="btn btn-primary" type="submit">Add game</button>
+        <p class="small text-body-secondary mt-2">You can review and edit the details before saving.</p>
+    </form>

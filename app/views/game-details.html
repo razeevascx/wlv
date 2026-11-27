@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="{{ app_base }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ game.game_name }} | Videogame catalogue</title>
+    <meta name="description" content="{{ game.game_description|striptags|slice(0, 155)|default('View the release date, rating, genres, platforms, and details for '~game.game_name~'.') }}">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/svg+xml" href="public/images/logo.svg" sizes="any">
+    <script nonce="{{ csp_nonce }}" src="public/js/theme.js" blocking="render"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="public/css/theme.css" rel="stylesheet">
+    <link rel="expect" href="#page-ready" blocking="render">
+</head>
+<body class="game-details-page">
+{% include 'components/navigation.html' %}
+<div class="details-backdrop" aria-hidden="true">
+        <img class="details-cover{{ game.external.cover|default(null) ? '' : ' is-placeholder' }}" src="{{ game.external.cover|default('public/images/logo.svg', true) }}" alt="" width="1280" height="720" fetchpriority="high" data-game-artwork>
+</div>
+<main class="container py-4 py-lg-5">
+    <article class="game-details">
+        <div class="details-hero">
+
+        <header class="details-header" id="page-ready">
+            <h1>{{ game.game_name }}</h1>
+            <dl class="details-stats mt-4 mb-0">
+                <div>
+                    <dt><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg> Release date</dt>
+                    <dd><time datetime="{{ game.released_date }}">{{ game.released_date ? game.released_date|date('j F Y') : 'To be announced' }}</time></dd>
+                </div>
+                <div>
+                    <dt><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></svg> {{ game.game_id ? 'Catalogue rating' : 'RAWG rating' }}</dt>
+                    <dd>{{ game.rating }} <span class="text-body-secondary fs-6 fw-normal">/ 10</span></dd>
+                </div>
+            </dl>
+            {% if game.external.genres|default([]) %}
+            <ul class="details-genres list-unstyled d-flex flex-wrap gap-2 mt-4 mb-0">
+                {% for genre in game.external.genres %}<li><a href="filter.php?genre={{ genre|url_encode }}">{{ genre }}</a></li>{% endfor %}
+            </ul>
+            {% endif %}
+        <div class="details-actions">
+            {% if user_id and game.owner_id == user_id %}
+            <button class="btn btn-outline-primary" type="button" command="show-modal" commandfor="edit-game-dialog">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5 4 4M4 20l5-1L21 7a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>
+                Edit game
+            </button>
+            <button class="btn btn-outline-danger" type="button" command="show-modal" commandfor="delete-game-dialog">
+                <i class="bi bi-trash3" aria-hidden="true"></i> Delete game
+            </button>
+            {% elseif user_id and not game.game_id and game.released_date and not game.external.adult_content|default(false) %}
+            <form action="add-game.php" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="rawg_id" value="{{ game.rawg_id }}">
+                <input type="hidden" name="GameName" value="{{ game.game_name }}">
+                <input type="hidden" name="GameDescription" value="{{ game.game_description }}">
+                <input type="hidden" name="DateReleased" value="{{ game.released_date }}">
+                <input type="hidden" name="GameRating" value="{{ game.rating }}">
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-plus-lg" aria-hidden="true"></i> Add to catalogue</button>
+            </form>
+            {% endif %}
+        </div>
+        {% if game.game_id and user_id %}
+            {% if collections|filter(c => not c.saved)|length %}
+            <form method="post" action="collections.php" class="mt-3">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="game_id" value="{{ game.game_id }}">
+                <label class="form-label fw-semibold" for="destination">Collection</label>
+                <div class="collection-picker">
+                <select class="form-select" name="collection_id" id="destination" required>
+                    <option value="" selected disabled>Choose a collection</option>
+                    {% for collection in collections %}<option value="{{ collection.id }}" {% if collection.saved %}disabled{% endif %}>{{ collection.name }}{% if collection.saved %} (already saved){% endif %}</option>{% endfor %}
+                </select>
+                <button class="btn btn-primary" name="action" value="add">Save to collection</button>
+                </div>
+            </form>
+            {% elseif collections %}
+            <p class="mt-3 mb-2">Saved to all your collections.</p>
+            <a class="btn btn-outline-primary" href="collections.php">View collections</a>
+            {% else %}
+            <button class="btn btn-primary" type="button" command="show-modal" commandfor="create-collection" aria-haspopup="dialog">Create a collection</button>
+            {% endif %}
+        {% elseif not user_id %}
+        <button type="button" class="btn btn-primary" command="show-modal" commandfor="login-dialog" aria-haspopup="dialog">
+            <i class="bi bi-collection me-1" aria-hidden="true"></i> Sign in to collect games
+        </button>
+        {% endif %}
+        </header>
+        </div>
+        <div class="details-content">
+        <aside class="details-extra" aria-labelledby="extra-details-title">
+            <h2 id="extra-details-title" class="h5 mb-3">Game information</h2>
+            {% if game.external %}
+            <dl class="rawg-metadata mt-4 mb-0">
+                {% for label, values in {'Genres': game.external.genres, 'Platforms': game.external.platforms, 'Developers': game.external.developers, 'Publishers': game.external.publishers} %}
+                {% if values %}<div><dt>{{ label }}</dt><dd>{{ values|join(', ') }}</dd></div>{% endif %}
+                {% endfor %}
+                {% if game.external.metacritic is not null %}<div><dt>Metacritic</dt><dd>{{ game.external.metacritic }}/100</dd></div>{% endif %}
+                {% if game.external.esrb|default(null) %}<div><dt>Age rating</dt><dd>{{ game.external.esrb }}</dd></div>{% endif %}
+                {% if game.external.playtime|default(0) > 0 %}<div><dt>Average playtime</dt><dd>{{ game.external.playtime }} hours</dd></div>{% endif %}
+                <div><dt>RAWG community rating</dt><dd>{{ game.external.rawg_rating }}/{{ game.external.rawg_rating_top }}{% if game.external.ratings_count|default(0) %} ({{ game.external.ratings_count|number_format }} ratings){% endif %}</dd></div>
+            </dl>
+            {% else %}
+            <p class="text-body-secondary mb-0">Extra information isn’t available for this game yet.</p>
+            {% endif %}
+        </aside>
+        <section class="details-description" aria-labelledby="about-game">
+            <h2 id="about-game" class="h5 mb-3">About the game</h2>
+            {% if game.game_description %}
+            <p class="text-body-secondary mb-0">{{ game.game_description|nl2br }}</p>
+            {% else %}
+            <p class="text-body-secondary mb-0">A description isn’t available for this game.</p>
+            {% endif %}
+        </section>
+        </div>
+        {% if game.external.screenshots|default([]) %}
+        <section class="details-gallery" aria-labelledby="screenshots-title">
+            <h2 id="screenshots-title" class="h5 mb-3">Screenshots</h2>
+            <div class="game-screenshots">
+                {% for image in game.external.screenshots %}
+                <a href="{{ image }}" target="_blank" rel="noopener noreferrer" data-lightbox-trigger aria-label="Open screenshot {{ loop.index }} of {{ game.game_name }}"><img src="{{ image }}" alt="{{ game.game_name }} screenshot {{ loop.index }}" width="640" height="360" loading="lazy" decoding="async"></a>
+                {% endfor %}
+            </div>
+        </section>
+        <dialog id="game-image-lightbox" class="lightbox-dialog" closedby="any" aria-labelledby="lightbox-title">
+            <h2 id="lightbox-title" class="visually-hidden">{{ game.game_name }} screenshots</h2>
+            <form class="lightbox-close-form" method="dialog"><button class="lightbox-close" type="submit" aria-label="Close screenshot" autofocus><i class="bi bi-x-lg" aria-hidden="true"></i></button></form>
+            <div class="lightbox-stage">
+                <button class="lightbox-nav lightbox-previous" type="button" aria-label="Previous screenshot"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+                <img id="lightbox-image" src="" alt="">
+                <button class="lightbox-nav lightbox-next" type="button" aria-label="Next screenshot"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+            </div>
+        </dialog>
+        {% endif %}
+
+    </article>
+</main>
+{% if user_id and game.game_id and not collections %}
+{% include 'components/collection-name-dialog.html' with {action: 'create', title: 'New collection'} %}
+{% endif %}
+{% if user_id and game.owner_id == user_id %}
+{% include 'components/manage-game-dialogs.html' %}
+{% endif %}
+{% include 'components/action-toast.html' %}
+<script nonce="{{ csp_nonce }}" src="public/js/game-artwork.js"></script>
+<script nonce="{{ csp_nonce }}" src="public/js/action-toast.js" defer></script>
+<script nonce="{{ csp_nonce }}" src="public/js/game-lightbox.js" defer></script>
+<script nonce="{{ csp_nonce }}" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+{% include 'components/footer.html' %}
+</body>
+</html>

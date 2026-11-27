@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="{{ app_base }}">
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block page_title %}Videogame catalogue{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Discover, search, and organize a videogame catalogue with ratings, release dates, genres, platforms, and artwork.{% endblock %}">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/svg+xml" href="public/images/logo.svg" sizes="any">
+    <script nonce="{{ csp_nonce }}" src="public/js/theme.js" blocking="render"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="public/css/theme.css" rel="stylesheet">
+    <link rel="expect" href="{{ latest_games ? '#latest-games-track' : '#page-ready' }}" blocking="render">
+</head>
+<body{% if latest_games %} class="catalogue-page"{% endif %}>
+{% include 'components/navigation.html' %}
+{% include 'components/latest-games.html' %}
+<main id="page-ready" class="container py-4">
+    {% block main_content %}
+    <h1 class="visually-hidden">Games</h1>
+    {% for genre_name, genre_games in genre_sections %}
+    <section class="genre-section mb-5" aria-labelledby="genre-heading-{{ loop.index }}">
+        <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+            <h2 id="genre-heading-{{ loop.index }}" class="h3 fw-semibold mb-0">{{ genre_name }}</h2>
+            <div class="d-flex gap-2" role="group" aria-label="{{ genre_name }} layout">
+                {% for layout, label in {'grid': 'Grid', 'list': 'List'} %}
+                <button class="btn btn-sm btn-outline-primary" type="button" data-section-view="{{ layout }}" aria-pressed="{{ view == layout ? 'true' : 'false' }}">
+                    <i class="bi {{ layout == 'grid' ? 'bi-grid' : 'bi-list-ul' }}" aria-hidden="true"></i> {{ label }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="game-grid" data-view="{{ view }}">
+            {% set section_prefix = 'genre-' ~ loop.index %}
+            {% for game in genre_games %}
+                {% include 'components/game-card.html' with {card_id_prefix: section_prefix} %}
+            {% endfor %}
+        </div>
+    </section>
+    {% else %}
+    <div class="game-empty text-center p-5">
+        <h2 class="h4">No games found</h2>
+        <p class="text-body-secondary">Try a different name or clear some filters.</p>
+        <a class="btn btn-outline-primary" href="index.php">Show all games</a>
+    </div>
+    {% endfor %}
+    {% endblock %}
+</main>
+{% include 'components/action-toast.html' %}
+{% if not user_id %}{% include 'components/add-game-dialog.html' %}{% endif %}
+<dialog id="search-game-dialog" aria-labelledby="search-game-title">
+    <div class="d-flex justify-content-between align-items-center gap-3">
+        <h2 id="search-game-title" class="h4 mb-0">Search games</h2>
+        <form method="dialog"><button class="btn-close" type="submit" aria-label="Close search games"></button></form>
+    </div>
+    <form class="row g-3 mt-2" method="get" action="filter.php">
+        <input type="hidden" name="view" value="{{ view }}">
+        <div class="col-12 position-relative">
+            <label class="visually-hidden" for="name">Search games</label>
+            <input autofocus autocomplete="off" class="form-control" id="name" name="name" value="{{ name }}" placeholder="Search by name">
+            <div id="suggestions" class="list-group position-absolute w-100" style="z-index:2"></div>
+        </div>
+        <div class="col-12 game-filter-form">
+            {% include 'components/game-filter-fields.html' with {filter_id: 'search'} %}
+        </div>
+        <div class="col-12 d-flex gap-2"><button class="btn btn-primary" type="submit"><i class="bi bi-search" aria-hidden="true"></i> Search</button><a class="btn btn-outline-primary" href="filter.php?view={{ view }}">Clear filters</a></div>
+    </form>
+    {% include 'components/rawg-search.html' with {lookup_id: 'search'} %}
+</dialog>
+<script nonce="{{ csp_nonce }}" src="public/js/add-game-dialog.js"></script>
+<script nonce="{{ csp_nonce }}" src="public/js/action-toast.js" defer></script>
+{% if not user_id %}<script nonce="{{ csp_nonce }}" src="public/js/rawg.js"></script>{% endif %}
+<script nonce="{{ csp_nonce }}" src="public/js/game-artwork.js"></script>
+<script nonce="{{ csp_nonce }}" src="public/js/game-layout.js"></script>
+<script nonce="{{ csp_nonce }}" src="public/js/latest-games.js" type="module"></script>
+<script nonce="{{ csp_nonce }}" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script nonce="{{ csp_nonce }}">
+const input = document.getElementById('name');
+const suggestions = document.getElementById('suggestions');
+let timer;
+input.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+        const response = await fetch(`ajax.php?search=${encodeURIComponent(input.value)}`);
+        const games = await response.json();
+        suggestions.replaceChildren(...games.map(game => {
+            const link = document.createElement('a');
+            link.className = 'list-group-item list-group-item-action';
+            link.href = `game-details.php?id=${encodeURIComponent(game.game_id)}`;
+            link.textContent = game.game_name;
+            return link;
+        }));
+    }, 200);
+});
+</script>
+{% include 'components/footer.html' %}
+</body>
+</html>

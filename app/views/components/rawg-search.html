@@ -1,0 +1,16 @@
+<search class="rawg-search mt-4" data-rawg-lookup hidden>
+    <form action="rawg.php" method="get" data-rawg-search aria-labelledby="rawg-heading-{{ lookup_id }}">
+        <h3 id="rawg-heading-{{ lookup_id }}" class="h6">Find a game on RAWG</h3>
+        <p class="small text-body-secondary">Search for a game to fill in its details, or enter them manually.</p>
+        <label class="form-label" for="rawg-query-{{ lookup_id }}">Game name</label>
+        <div class="d-flex gap-2">
+            <input class="form-control" id="rawg-query-{{ lookup_id }}" name="search" type="search" minlength="2" maxlength="100" required placeholder="e.g. Elden Ring" autocomplete="off" autocorrect="off" spellcheck="false">
+            <button class="btn btn-outline-primary" type="submit">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
+                Search
+            </button>
+        </div>
+    </form>
+    <p class="small mt-2 mb-0" role="status" data-rawg-status></p>
+    <ul class="rawg-results list-unstyled mt-2 mb-0" data-rawg-results></ul>
+</search>

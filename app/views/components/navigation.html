@@ -1,0 +1,44 @@
+<nav class="navbar" aria-label="Main navigation">
+    <div class="container nav-layout">
+        <a class="navbar-brand d-flex align-items-center" href="index.php" aria-label="Home" title="Home">
+            <img src="public/images/logo.svg" alt="Videogame catalogue" width="36" height="36">
+            <span class="nav-brand-name">Game Catalogue</span>
+        </a>
+        <div class="nav-center d-flex align-items-center gap-3">
+            <a class="nav-text-action" href="index.php">Browse</a>
+            {% if user_id %}
+            <a class="nav-text-action" href="my-games.php">My games</a>
+            <a class="nav-text-action" href="collections.php">My collections</a>
+            {% else %}
+            <a class="nav-text-action" href="index.php?auth=login" data-account-dialog="login-dialog">Get started</a>
+            {% endif %}
+        </div>
+        <div class="nav-tools d-flex align-items-center gap-2">
+            {% if user_id %}
+            <form method="post" action="logout.php"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="nav-text-action">Sign out</button></form>
+            {% endif %}
+            {% if add_game_modal|default(false) %}
+            <button class="nav-text-action nav-search-control" type="button" command="show-modal" commandfor="search-game-dialog" aria-label="Search games" title="Search games"><i class="bi bi-search" aria-hidden="true"></i><span>Search</span></button>
+            {% else %}
+            <a class="nav-text-action nav-search-control" href="index.php?search=1" aria-label="Search games" title="Search games"><i class="bi bi-search" aria-hidden="true"></i><span>Search</span></a>
+            {% endif %}
+            <button class="nav-icon" id="theme-toggle" type="button" aria-label="Switch theme" title="Switch theme" aria-pressed="false" hidden><i class="bi bi-moon-stars" aria-hidden="true"></i></button>
+        </div>
+    </div>
+</nav>
+<script nonce="{{ csp_nonce }}" src="public/js/action-dialogs.js" defer></script>
+{% if user_id %}
+{% include 'components/add-game-dialog.html' %}
+<script nonce="{{ csp_nonce }}" src="public/js/rawg.js" defer></script>
+{% endif %}
+{% if not user_id %}
+{% for mode, title in {login: 'Sign in', signup: 'Create account'} %}
+<dialog id="{{ mode }}-dialog" class="action-dialog action-dialog--compact" aria-labelledby="{{ mode }}-title">
+    {% include 'components/account-form.html' with {prefix: mode, signup: mode == 'signup', heading: title, csrf_token: csrf_token, modal: true, error: account_error.signup is defined and account_error.signup == (mode == 'signup') ? account_error.error : '', email: account_error.signup is defined and account_error.signup == (mode == 'signup') ? account_error.email : ''} only %}
+    {% if mode == 'login' %}
+    <p class="mt-3 mb-0">New here? <a href="index.php?auth=signup" data-account-dialog="signup-dialog">Sign up</a></p>
+    {% endif %}
+</dialog>
+{% endfor %}
+<script nonce="{{ csp_nonce }}" src="public/js/account-dialogs.js" defer></script>
+{% endif %}

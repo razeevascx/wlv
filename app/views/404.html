@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="{{ app_base }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base href="/">
+    <title>Page not found | Videogame catalogue</title>
+    <meta name="description" content="We couldn’t find that page or game. Return to the videogame catalogue to find your next adventure.">
+    <meta name="robots" content="noindex">
+    <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/svg+xml" href="public/images/logo.svg" sizes="any">
+    <script nonce="{{ csp_nonce }}" src="public/js/theme.js" blocking="render"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="public/css/theme.css" rel="stylesheet">
+    <link rel="expect" href="#page-ready" blocking="render">
+</head>
+<body class="not-found-page">
+<main id="page-ready" class="not-found-content text-center p-4">
+    <div class="not-found-icon mx-auto mb-4">
+        <img src="public/images/logo.svg" alt="Videogame catalogue" width="88" height="88">
+    </div>
+    <p class="not-found-code fw-bold mb-2">404</p>
+    <h1 class="h2 fw-semibold mb-3">This level doesn’t exist</h1>
+    <p class="text-body-secondary mb-4">We couldn’t find that page or game.<br>Head back to the catalogue and find your next adventure.</p>
+    <a class="btn btn-primary" href="index.php">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m12 3-9 8v10h6v-7h6v7h6V11Z"/></svg>
+        Back to Home
+    </a>
+</main>
+{% include 'components/footer.html' %}
+</body>
+</html>

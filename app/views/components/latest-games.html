@@ -1,0 +1,29 @@
+{% if latest_games %}
+<section class="latest-games" aria-roledescription="carousel" aria-labelledby="latest-games-title">
+    <h2 id="latest-games-title" class="visually-hidden">Latest &amp; New</h2>
+    <div class="latest-controls" data-latest-controls hidden>
+        <button type="button" data-latest-step="-1" aria-controls="latest-games-track" aria-label="Previous game"><i class="bi bi-chevron-left" aria-hidden="true"></i></button>
+        <div class="latest-markers" aria-label="Choose a featured game" data-latest-markers hidden>
+            {% for game in latest_games %}
+            <button type="button" data-latest-index="{{ loop.index0 }}" aria-label="Show {{ game.game_name }}, {{ loop.index }} of {{ latest_games|length }}"{% if loop.first %} aria-current="true"{% endif %}><span></span></button>
+            {% endfor %}
+        </div>
+        <button type="button" data-latest-step="1" aria-controls="latest-games-track" aria-label="Next game"><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+    </div>
+    <div id="latest-games-track" class="latest-track" tabindex="0" role="group" aria-label="Latest game slides">
+        {% for game in latest_games %}
+        <div class="latest-slide" role="group" aria-roledescription="slide" aria-label="{{ loop.index }} of {{ latest_games|length }}">
+            <a class="latest-slide-link" href="game-details.php?id={{ game.game_id }}" aria-labelledby="latest-title-{{ game.game_id }}">
+                <img class="latest-cover{{ game.external.cover|default(null) ? '' : ' is-placeholder' }}" src="{{ game.external.cover|default('public/images/logo.svg', true) }}" alt="" width="1280" height="720" {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} decoding="async" data-game-artwork>
+                <div class="latest-copy">
+                    <p class="small mb-2">Released {{ game.released_date|date('j M Y') }} <span aria-hidden="true">·</span> <i class="bi bi-star-fill" aria-hidden="true"></i> {{ game.rating }}/10</p>
+                    <h3 id="latest-title-{{ game.game_id }}">{{ game.game_name }}</h3>
+                    <p class="latest-summary">{{ game.game_description|slice(0, 220) }}{{ game.game_description|length > 220 ? '…' : '' }}</p>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    <p class="visually-hidden" role="status" data-latest-status></p>
+</section>
+{% endif %}

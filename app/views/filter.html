@@ -1,0 +1,38 @@
+{% extends 'index.html' %}
+
+{% block page_title %}{{ genre ? genre ~ ' games' : 'Filter games' }} | Videogame catalogue{% endblock %}
+{% block meta_description %}Browse{% if genre %} {{ genre }}{% endif %} videogames. Filter the catalogue by game title, developer, platform, release year, and rating.{% endblock %}
+
+{% block main_content %}
+<section class="genre-section" aria-labelledby="filter-results-title">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <h1 id="filter-results-title" class="h3 fw-semibold mb-0">{{ genre ? genre ~ ' games' : 'Filtered games' }}</h1>
+        <div class="d-flex gap-2" role="group" aria-label="Results layout">
+            {% for layout, label in {'grid': 'Grid', 'list': 'List'} %}
+            <button class="btn btn-sm btn-outline-primary" type="button" data-section-view="{{ layout }}" aria-pressed="{{ view == layout ? 'true' : 'false' }}"><i class="bi {{ layout == 'grid' ? 'bi-grid' : 'bi-list-ul' }}" aria-hidden="true"></i> {{ label }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        {% for label, value in {'Name': name, 'Developer / publisher': author, 'Genre': genre, 'Platform': platform, 'From year': from_year, 'To year': to_year, 'Minimum rating': min_rating} %}
+        {% if value is not same as('') %}<span class="filter-chip">{{ label }}: {{ value }}</span>{% endif %}
+        {% endfor %}
+    </div>
+    <div class="game-grid" data-view="{{ view }}">
+        {% for game in games %}
+            {% include 'components/game-card.html' with {card_id_prefix: 'filter'} %}
+        {% else %}
+        <div class="game-empty text-center p-5">
+            <h2 class="h4">No games found</h2>
+            <p class="text-body-secondary">Try another genre or change your search filters.</p>
+            <a class="btn btn-outline-primary" href="filter.php">Clear filters</a>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+        <button class="btn btn-outline-primary" type="button" id="view-more-games" hidden><i class="bi bi-plus-lg" aria-hidden="true"></i> View more</button>
+        <p class="small text-body-secondary mt-2" role="status" id="view-more-status"></p>
+    </div>
+</section>
+<script nonce="{{ csp_nonce }}" src="public/js/more-games.js" defer></script>
+{% endblock %}

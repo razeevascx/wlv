@@ -1,0 +1,29 @@
+{% extends 'account-layout.html' %}
+{% block title %}My games{% endblock %}
+{% block content %}
+<header class="collection-header">
+    <div>
+        <h1>My games</h1>
+        <p>{{ games|length }} {{ games|length == 1 ? 'game' : 'games' }} added to the catalogue</p>
+    </div>
+    <button class="btn btn-primary" type="button" command="show-modal" commandfor="add-game-dialog">+ Add game</button>
+</header>
+<div class="collection-grid">
+    {% for game in games %}
+    <div class="saved-game">
+        {% include 'components/game-card.html' %}
+        <div class="saved-game-actions d-flex gap-2 justify-content-end">
+            <button class="btn btn-sm btn-outline-primary" type="button" command="show-modal" commandfor="edit-game-dialog-{{ game.game_id }}">Edit</button>
+            <button class="btn btn-sm btn-outline-danger" type="button" command="show-modal" commandfor="delete-game-dialog-{{ game.game_id }}">Delete</button>
+        </div>
+        {% include 'components/manage-game-dialogs.html' with {dialog_suffix: '-' ~ game.game_id} %}
+    </div>
+    {% else %}
+    <div class="collection-empty"><h2>No games added yet</h2><p>Choose Add game to contribute your first title.</p></div>
+    {% endfor %}
+</div>
+{% include 'components/action-toast.html' %}
+<script nonce="{{ csp_nonce }}" src="public/js/action-toast.js" defer></script>
+<script nonce="{{ csp_nonce }}" src="public/js/game-artwork.js" defer></script>
+<script nonce="{{ csp_nonce }}" src="public/js/add-game-dialog.js" defer></script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% if flash_toast %}
+<div class="action-toast-region" role="region" aria-label="Notifications">
+    <div id="action-toast" class="action-toast action-toast--{{ flash_toast.type|default('success') }}" popover="manual" role="status">
+        <i class="bi {{ flash_toast.type|default('success') == 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' }}" aria-hidden="true"></i>
+        <p class="mb-0">{{ flash_toast.message }}</p>
+        <button class="btn-close" type="button" popovertarget="action-toast" popovertargetaction="hide" aria-label="Dismiss notification"></button>
+    </div>
+</div>
+{% endif %}

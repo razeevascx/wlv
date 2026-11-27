@@ -1,0 +1,23 @@
+<div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+    <h1 id="{{ prefix }}-title"{% if modal %} class="h4 mb-0"{% endif %}>{{ signup ? 'Welcome to the Videogame Catalogue' : 'Welcome back' }}</h1>
+    {% if modal %}<form method="dialog"><button class="btn-close" aria-label="Close"></button></form>{% endif %}
+</div>
+<p class="text-body-secondary">{{ signup ? 'Create an account to save your favourite games and build your first collection.' : 'Sign in to revisit your collections and add your next game.' }}</p>
+<p role="alert" class="text-danger" data-account-error {% if not error %}hidden{% endif %}>{{ error }}</p>
+<form method="post" action="{{ signup ? 'signup.php' : 'login.php' }}" style="max-width: 28rem">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="{{ prefix }}-email" class="form-label">Email address</label>
+    <input id="{{ prefix }}-email" name="email" type="email" {% if modal %}autofocus{% endif %} autocomplete="username" class="form-control mb-3" value="{{ email }}" required maxlength="254">
+    <label for="{{ prefix }}-password" class="form-label">Password</label>
+    <input id="{{ prefix }}-password" name="password" type="password" autocomplete="{{ signup ? 'new-password' : 'current-password' }}" class="form-control mb-3" required {% if signup %}minlength="8" aria-describedby="{{ prefix }}-password-help"{% endif %}>
+    {% if signup %}<p id="{{ prefix }}-password-help">Use at least 8 characters.</p>{% endif %}
+    <div class="mb-3">
+        <label class="form-label" for="{{ prefix }}-captcha">Security check</label>
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <img data-captcha src="captcha.php?mode={{ signup ? 'signup' : 'login' }}" width="220" height="64" alt="Security challenge. Enter the six characters shown.">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-refresh-captcha aria-label="Get a new security image">Refresh</button>
+        </div>
+        <input class="form-control" id="{{ prefix }}-captcha" name="captcha" required minlength="6" maxlength="6" autocomplete="off" spellcheck="false" autocapitalize="characters">
+    </div>
+    <button class="btn btn-primary">{{ heading }}</button>
+</form>

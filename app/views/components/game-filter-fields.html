@@ -1,0 +1,34 @@
+{% for field, label in {'author': 'Developer / publisher', 'genre': 'Genre', 'platform': 'Platform'} %}
+<div>
+    <label class="form-label" for="{{ filter_id }}-{{ field }}">{{ label }}</label>
+    <select class="form-select" id="{{ filter_id }}-{{ field }}" name="{{ field }}">
+        <option value="">All {{ field == 'author' ? 'developers / publishers' : field == 'genre' ? 'genres' : 'platforms' }}</option>
+        {% for option in filter_options[field] %}
+        <option value="{{ option }}"{{ attribute(_context, field) == option ? ' selected' : '' }}>{{ option }}</option>
+        {% endfor %}
+    </select>
+</div>
+{% endfor %}
+<div>
+    <label class="form-label" for="{{ filter_id }}-from-year">From year</label>
+    <input class="form-control" id="{{ filter_id }}-from-year" type="number" name="from_year" value="{{ from_year }}" min="1900" max="2100" placeholder="Any year">
+</div>
+<div>
+    <label class="form-label" for="{{ filter_id }}-to-year">To year</label>
+    <input class="form-control" id="{{ filter_id }}-to-year" type="number" name="to_year" value="{{ to_year }}" min="1900" max="2100" placeholder="Any year">
+</div>
+<div>
+    <label class="form-label" for="{{ filter_id }}-rating">Minimum rating</label>
+    <select class="form-select" id="{{ filter_id }}-rating" name="min_rating">
+        <option value="">Any rating</option>
+        {% for value in 0..10 %}<option value="{{ value }}"{{ min_rating is not same as('') and min_rating == value ? ' selected' : '' }}>{{ value }} / 10 and above</option>{% endfor %}
+    </select>
+</div>
+<div>
+    <label class="form-label" for="{{ filter_id }}-sort">Sort by</label>
+    <select class="form-select" id="{{ filter_id }}-sort" name="sort">
+        {% for value, label in {'newest': 'Newest first', 'title': 'Title A–Z', 'rating': 'Highest rated'} %}
+        <option value="{{ value }}"{{ sort == value ? ' selected' : '' }}>{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
